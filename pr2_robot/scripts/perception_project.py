@@ -136,7 +136,7 @@ def pcl_callback(pcl_msg):
     detected_objects_labels = []
     detected_objects = []
 
-    for index, pts_list in enumerate(cluster_cloud):
+    for index, pts_list in enumerate(cluster_indices):
 
         # Grab the points for the cluster
         pcl_cluster = cluster_cloud.extract(pts_list)
@@ -146,7 +146,6 @@ def pcl_callback(pcl_msg):
 
         # Extract histogram features
         # TODO: complete this step just as is covered in capture_features.py
-        #labeled_features = []
         chists = compute_color_histograms(ros_cluster, using_hsv=True)
         normals = get_normals(ros_cluster)
         nhists = compute_normal_histograms(normals)
