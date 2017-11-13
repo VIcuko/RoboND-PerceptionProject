@@ -54,8 +54,15 @@ def pcl_callback(pcl_msg):
     # TODO: Convert ROS msg to PCL data
     cloud = ros_to_pcl(pcl_msg)
 
+    # TODO: Filter noise
+    outlier_filter = cloud.make_statistical_outlier_filter()
+    
+    outlier_filter.set_mean_k(20)
+    outlier_filter.set_std_dev_mul_thresh(0.3)
+    cloud_filtered = outlier_filter.filter()
+
     # TODO: Voxel Grid Downsampling:
-    vox = cloud.make_voxel_grid_filter()
+    vox = cloud_filtered.make_voxel_grid_filter()
     LEAF_SIZE = 0.01
     vox.set_leaf_size(LEAF_SIZE, LEAF_SIZE, LEAF_SIZE)
 
@@ -86,14 +93,6 @@ def pcl_callback(pcl_msg):
      # TODO: Extract inliers and outliers
     extracted_inliers_table = cloud_filtered.extract(inliers, negative=False)
     extracted_outliers_objects = cloud_filtered.extract(inliers, negative=True)
-
-    # TODO: Filter noise
-    outlier_filter = extracted_outliers_objects.make_statistical_outlier_filter()
-    
-    outlier_filter.set_mean_k(50)
-    x = 1.0
-    outlier_filter.set_std_dev_mul_thresh(x)
-    cloud_filtered = outlier_filter.filter()
 
     # TODO: Euclidean Clustering
     white_cloud = XYZRGB_to_XYZ(cloud_filtered)
@@ -186,6 +185,11 @@ def pcl_callback(pcl_msg):
 
     # Publish the list of detected objects
     detected_objects_pub.publish(detected_objects)
+
+    pcl.save(ros_cloud_table, "table")
+    pcl.save(ros_cloud_objects, "objects")
+    pcl.save(ros_cloud_objects_nonoise, "objects_no_noise")
+    pcl.save(ros_cluster_cloud, "cluster_cloud")
     
     # Suggested location for where to invoke your pr2_mover() function within pcl_callback()
     # Could add some logic to determine whether or not your object detections are robust
