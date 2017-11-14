@@ -196,7 +196,7 @@ def pcl_callback(pcl_msg):
     # Publish the list of detected objects
     detected_objects_pub.publish(detected_objects)
 
-    test_case = 1
+    test_case = 3
     pcl.save(extracted_inliers_table, "table"+ str(test_case) + ".pcd")
     pcl.save(extracted_outliers_objects, "objects"+ str(test_case) + ".pcd")
     pcl.save(cluster_cloud, "cluster_cloud"+ str(test_case) + ".pcd")
@@ -231,7 +231,7 @@ def pr2_mover(object_list):
 
     # Define test case
     test_scene_num = Int32()
-    test_scene_num.data = 1
+    test_scene_num.data = 3
 
     # Define position of each dropbox
     red_dropbox = dropbox_param[0]['position']
