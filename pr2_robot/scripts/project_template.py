@@ -196,9 +196,10 @@ def pcl_callback(pcl_msg):
     # Publish the list of detected objects
     detected_objects_pub.publish(detected_objects)
 
-    pcl.save(extracted_inliers_table, "table.pcd")
-    pcl.save(extracted_outliers_objects, "objects.pcd")
-    pcl.save(cluster_cloud, "cluster_cloud.pcd")
+    test_case = 1
+    pcl.save(extracted_inliers_table, "table"+ str(test_case) + ".pcd")
+    pcl.save(extracted_outliers_objects, "objects"+ str(test_case) + ".pcd")
+    pcl.save(cluster_cloud, "cluster_cloud"+ str(test_case) + ".pcd")
     
     # Suggested location for where to invoke your pr2_mover() function within pcl_callback()
     # Could add some logic to determine whether or not your object detections are robust
@@ -214,35 +215,35 @@ def pr2_mover(object_list):
     # TODO: Initialize variables
     # Create list of objects sorted as of the pick list
     sorted_objects = []
-    
     labels = []
     centroids = [] # to be list of tuples (x, y, z)
+    dropbox = []
     yaml_params = []
 
     # TODO: Get/Read parameters
     object_list_param = rospy.get_param('/object_list')
+    dropbox_param = rospy.get_param('/dropbox')
 
-    # Check if list corresponds to scenery
+    # Check if list corresponds to current scenery
     if not len(object_list) == len(object_list_param):
         rospy.loginfo("List of detected objects does not match pick list.")
         return
 
-    #num_scene = rospy.get_param('/test_scene_num')
+    # Define test case
     test_scene_num = Int32()
     test_scene_num.data = 1
 
-    dropbox_param = rospy.get_param('/dropbox')
+    # Define position of each dropbox
     red_dropbox = dropbox_param[0]['position']
     green_dropbox = dropbox_param[1]['position']
 
-    # TODO: Parse parameters into individual variables
-
-    # TODO: Rotate PR2 in place to capture side tables for the collision map
-
     # TODO: Loop through the pick list
     for i in range(len(object_list_param)):
+
+        # Get the label for of each item in the pick list
         object_label = object_list_param[i]['name']
 
+        # Iterate over object until a match is found between list and environment
         for current_object in object_list:
             if current_object.label == object_label:
                 sorted_objects.append(current_object)
@@ -257,37 +258,39 @@ def pr2_mover(object_list):
         points_arr = ros_to_pcl(object_sorted.cloud).to_array()
         centroids.append(np.mean(points_arr, axis=0)[:3])
 
+        for current_object in object_list_param:
+
+            if current_object['name'] == object_sorted.label:
+                dropbox.append(current_object['group'])
+                break
+
     for i in range(len(sorted_objects)):
 
         object_name = String()
         object_name.data = object_list_param[i]['name']
 
-        object_group = String()
-        object_group.data = object_list_param[i]['group']
+        object_box = dropbox[i]
 
         # Convert <numpy.float64> data type to native float as expected by ROS
         np_centroid = centroids[i]
-        scalar_centroid = [np.asscalar(element) for element in np_centroid]
+        s_centroid = [np.asscalar(element) for element in np_centroid]
 
         # Create 'pick_pose' message with centroid as the position data
         pick_pose = Pose()
-        pick_pose.position.x = scalar_centroid[0]
-        pick_pose.position.y = scalar_centroid[1]
-        pick_pose.position.z = scalar_centroid[2]
+        pick_pose.position.x = s_centroid[0]
+        pick_pose.position.y = s_centroid[1]
+        pick_pose.position.z = s_centroid[2]
 
         # TODO: Create 'place_pose' for the object
         place_pose = Pose()
-        if object_group == 'red':
-            dropbox_position = red_dropbox
-        else:
-            dropbox_position = green_dropbox        
-        place_pose.position.x = dropbox_position[0]
-        place_pose.position.y = dropbox_position[1]
-        place_pose.position.z = dropbox_position[2]
+        dropbox_pos = green_dropbox if object_box == 'green' else red_dropbox
+        place_pose.position.x = dropbox_pos[0]
+        place_pose.position.y = dropbox_pos[1]
+        place_pose.position.z = dropbox_pos[2]
 
         # TODO: Assign the arm to be used for pick_place
         arm_name = String()
-        arm_name.data = 'right' if object_group == 'green' else 'left'
+        arm_name.data = 'right' if object_box == 'green' else 'left'
 
         # TODO: Create a list of dictionaries (made with make_yaml_dict()) for later output to yaml format
         yaml_params.append(make_yaml_dict(test_scene_num, arm_name, object_name, pick_pose, place_pose))
