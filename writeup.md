@@ -15,10 +15,30 @@
 [pr2]: ./writeup_images/pr2.png
 
 1. Extract features and train an SVM model on new objects (see `pick_list_*.yaml` in `/pr2_robot/config/` for the list of models you'll be trying to identify).
-As shown during the Robotics course, 
+As shown during the Robotics course, the robot was trained using the sensor_stick package from the exercises previous to the project. Using this, the robot was trained considering the following parameters:
 
+Number of bins: 32
+Number of positions viewed per object: 30
+Classifier used: svm.SVC(kernel='linear')
+Modifying the models to include all the objects in the 3 scenarios.
+
+Once having defined the parameters, I carried out the capture of all the objects and then executed the training.
+
+The training data results were:
+
+![training data][training_data]
+
+And the normalized results were:
+
+![training data][normalized_training_data]
 
 2. Write a ROS node and subscribe to `/pr2/world/points` topic. This topic contains noisy point cloud data that you must work with.
+
+As it may be observed in the file "project_template" in line 323 is subscribed to "/pr2/world/points".
+
+```python
+pcl_sub = rospy.Subscriber("/pr2/world/points", pc2.PointCloud2, pcl_callback, queue_size=1)
+```
 
 3. Use filtering and RANSAC plane fitting to isolate the objects of interest from the rest of the scene.
 
