@@ -222,6 +222,11 @@ def pr2_mover(object_list):
     # TODO: Get/Read parameters
     object_list_param = rospy.get_param('/object_list')
 
+    # Check if list corresponds to scenery
+    if not len(object_list) == len(object_list_param):
+        rospy.loginfo("List of detected objects does not match pick list.")
+        return
+
     #num_scene = rospy.get_param('/test_scene_num')
     test_scene_num = Int32()
     test_scene_num.data = 1
@@ -282,10 +287,7 @@ def pr2_mover(object_list):
 
         # TODO: Assign the arm to be used for pick_place
         arm_name = String()
-        if object_group == 'red':
-            arm_name.data = 'left'
-        else:
-            arm_name.data = 'right'
+        arm_name.data = 'right' if object_group == 'green' else 'left'
 
         # TODO: Create a list of dictionaries (made with make_yaml_dict()) for later output to yaml format
         yaml_params.append(make_yaml_dict(test_scene_num, arm_name, object_name, pick_pose, place_pose))
