@@ -12,8 +12,8 @@ You're reading it!
 [layout1-clusters]: ./writeup_images/layout1-clusters.png
 [layout2-clusters]: ./writeup_images/layout2-clusters.png
 [layout3-clusters]: ./writeup_images/layout3-clusters.png
-[layout1-tags]: ./writeup_images/layout3-tags.png
-[layout2-tags]: ./writeup_images/layout3-tags.png
+[layout1-tags]: ./writeup_images/layout1-tags.png
+[layout2-tags]: ./writeup_images/layout2-tags.png
 [layout3-tags]: ./writeup_images/layout3-tags.png
 [table]: ./writeup_images/table.png
 [training_data]: ./writeup_images/training_data.png
