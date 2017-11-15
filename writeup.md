@@ -12,6 +12,8 @@ You're reading it!
 [layout1-clusters]: ./writeup_images/layout1-clusters.png
 [layout2-clusters]: ./writeup_images/layout2-clusters.png
 [layout3-clusters]: ./writeup_images/layout3-clusters.png
+[layout1-tags]: ./writeup_images/layout3-tags.png
+[layout2-tags]: ./writeup_images/layout3-tags.png
 [layout3-tags]: ./writeup_images/layout3-tags.png
 [table]: ./writeup_images/table.png
 [training_data]: ./writeup_images/training_data.png
@@ -210,8 +212,10 @@ label_pos[2] += .4
 object_markers_pub.publish(make_label(label,label_pos, index))
 ```
 
-After all this processing, the result for the last scenarios which was the more complex containing the greatest amount of objects was the following:
+After all this processing, the object identification result for all the scenarios are the following:
 
+![1st scenario tags][layout1-tags]
+![2nd scenario tags][layout2-tags]
 ![3rd scenario tags][layout3-tags]
 
 6. Calculate the centroid (average in x, y and z) of the set of points belonging to that each object.
